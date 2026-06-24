@@ -1,6 +1,5 @@
-// B.IA PROD - API via Groq (Llama 3.3 70B)
-// Free tier: 1000 req/dia, sem cartao, CORS habilitado
-// OpenAI-compatible endpoint
+// B.IA PROD - API via Groq (llama-3.3-70b-versatile)
+// Free tier: 1000 req/dia, sem cartao
 
 const SYSTEM_PROMPT = `Voce e o B.IA PROD - agente de producao executiva da captacao audiovisual do Itajai Boat Show 2026.
 
@@ -32,7 +31,7 @@ export async function callClaude(messages, systemOverride) {
   const key = import.meta.env.VITE_GROQ_KEY
   if (!key) throw new Error('Chave VITE_GROQ_KEY nao configurada')
 
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -48,9 +47,9 @@ export async function callClaude(messages, systemOverride) {
     }),
   })
 
-  const data = await res.json()
-  if (data.error) throw new Error(data.error.message)
-  return data.choices?.[0]?.message?.content || ''
+  const d = await r.json()
+  if (d.error) throw new Error(d.error.message)
+  return d.choices?.[0]?.message?.content || ''
 }
 
 export function buildIdeaPrompt(assunto, tipo) {
