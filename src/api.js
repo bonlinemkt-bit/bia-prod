@@ -1,6 +1,6 @@
-// B.IA PROD - API via Puter.js
-// Sem chave de API, sem cartao, sem backend
-// Puter.js provê acesso gratuito ao Claude diretamente no browser
+// B.IA PROD - API via Groq (Llama 3.3 70B)
+// Free tier: 1000 req/dia, sem cartao, CORS habilitado
+// OpenAI-compatible endpoint
 
 const SYSTEM_PROMPT = `Voce e o B.IA PROD - agente de producao executiva da captacao audiovisual do Itajai Boat Show 2026.
 
@@ -14,7 +14,7 @@ CONTEXTO:
 
 ENTREGAVEIS:
 - Stories diarios: corte seco, musica, solta
-- 4 Reels/dia caprichados
+- 4 Reels/dia caprichados - foco real de qualidade
 - Ritual de venda: vendedor avisa Stefano via WhatsApp => champagne, brinde, tacas
 - Test drive 355: Stefano embarca, capta depoimento na saida
 - Drone: 4 barcos alinhados - foto vertical 100% + video passando por cima
@@ -28,41 +28,29 @@ NF: Stefano emite no inicio - pagamento semana seguinte
 FLUXO: duvidas de Stefano => B.IA PROD => se nao souber, gera lista para Thay responder.
 Resposta direta, tecnica, executavel. Apenas producao audiovisual e logistica.`
 
-async function loadPuter() {
-  if (typeof window.puter !== 'undefined') return window.puter
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = 'https://js.puter.com/v2/'
-    script.onload = () => resolve(window.puter)
-    script.onerror = () => reject(new Error('Falha ao carregar Puter.js'))
-    document.head.appendChild(script)
-  })
-}
-
-function extrairTexto(r) {
-  // Puter retorna objeto com message.content[0].text
-  if (r?.message?.content?.[0]?.text) return r.message.content[0].text
-  if (r?.content?.[0]?.text) return r.content[0].text
-  if (r?.text) return r.text
-  if (typeof r?.toString === 'function') {
-    const s = r.toString()
-    if (s !== '[object Object]') return s
-  }
-  return JSON.stringify(r)
-}
-
 export async function callClaude(messages, systemOverride) {
-  const puter = await loadPuter()
-  const sys = systemOverride || SYSTEM_PROMPT
+  const key = import.meta.env.VITE_GROQ_KEY
+  if (!key) throw new Error('Chave VITE_GROQ_KEY nao configurada')
 
-  const history = [
-    { role: 'user', content: `[INSTRUCOES DO AGENTE]\n${sys}` },
-    { role: 'assistant', content: 'Entendido. Pronto para atuar como B.IA PROD.' },
-    ...messages
-  ]
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: 2000,
+      messages: [
+        { role: 'system', content: systemOverride || SYSTEM_PROMPT },
+        ...messages,
+      ],
+    }),
+  })
 
-  const response = await puter.ai.chat(history, { model: 'claude-sonnet-4-6' })
-  return extrairTexto(response)
+  const data = await res.json()
+  if (data.error) throw new Error(data.error.message)
+  return data.choices?.[0]?.message?.content || ''
 }
 
 export function buildIdeaPrompt(assunto, tipo) {
