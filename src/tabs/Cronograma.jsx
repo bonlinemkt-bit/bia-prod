@@ -10,7 +10,7 @@ export default function Cronograma({ fases, onToggle }) {
         return (
           <Card key={fase.id}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.white }}>{fase.icon} {fase.label}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.white }}>{fase.label}</div>
               <Badge color={done === fase.items.length && done > 0 ? C.green : fase.color}>{done}/{fase.items.length}</Badge>
             </div>
             <ProgressBar value={done} total={fase.items.length} color={fase.color} />
