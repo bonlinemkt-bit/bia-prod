@@ -40,7 +40,7 @@ export default function Dashboard({ fases, refs, onTabChange }) {
           return (
             <div key={f.id} onClick={() => onTabChange('cronograma')} style={{ marginBottom:10, cursor:'pointer' }}>
               <div style={{ display:'flex', justifyContent:'space-between', fontSize:12, marginBottom:4 }}>
-                <span style={{ color:C.text }}>{f.icon} {f.label}</span>
+                <span style={{ color:C.text }}>{f.label}</span>
                 <span style={{ color:f.color, fontWeight:700 }}>{d}/{f.items.length}</span>
               </div>
               <ProgressBar value={d} total={f.items.length} color={f.color} />
