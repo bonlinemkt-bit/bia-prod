@@ -2,21 +2,22 @@ import { C, RESP_COLOR } from '../constants.js'
 import { BRIEFING } from '../data.js'
 import { Card, Badge, ProgressBar, SectionLabel } from '../components.jsx'
 
-const PENDENCIAS = [
-  { resp:'Thay', prazo:'ate 27/Jun', item:'Enviar brand guide (fontes, cores, guide da campanha)' },
-  { resp:'Thay', prazo:'ate 27/Jun', item:'Abrir Google Drive e adicionar Stefano como editor' },
-  { resp:'Thay', prazo:'antes 02/Jul', item:'Autorizacao formal de voo de drone junto a organizacao' },
-  { resp:'Stefano', prazo:'ate 27/Jun', item:'Confirmar e-mail para acesso ao Drive' },
-  { resp:'Stefano', prazo:'antes do evento', item:'Montar cronograma diario por periodo (manha/tarde/noite)' },
-  { resp:'Bernard', prazo:'imediato', item:'Enviar link do agente B.IA PROD para Stefano' },
-]
-
 export default function Dashboard({ fases, refs, onTabChange }) {
   const totalItens = fases.reduce((a,f) => a+f.items.length, 0)
   const doneItens = fases.reduce((a,f) => a+f.items.filter(i=>i.done).length, 0)
   const fasePre = fases.find(f=>f.id==='pre')
   const donePre = fasePre.items.filter(i=>i.done).length
   const refsOk = refs.filter(r=>r.status==='recebido').length
+
+  // Pendencias dinamicas: itens nao concluidos da fase pre + refs pendentes
+  const pendencias = [
+    ...fasePre.items
+      .filter(it => !it.done)
+      .map(it => ({ resp: it.resp, prazo: it.data, item: it.texto })),
+    ...refs
+      .filter(r => r.status === 'pendente')
+      .map(r => ({ resp: 'Thay', prazo: 'pendente', item: r.nome + (r.obs ? ` — ${r.obs}` : '') })),
+  ]
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
@@ -49,16 +50,19 @@ export default function Dashboard({ fases, refs, onTabChange }) {
         })}
       </Card>
       <Card>
-        <SectionLabel>Pendencias Criticas</SectionLabel>
-        {PENDENCIAS.map((p,i) => (
-          <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start', padding:'6px 0', borderBottom:`1px solid ${C.border}` }}>
-            <Badge color={RESP_COLOR[p.resp]||C.muted}>{p.resp}</Badge>
-            <div style={{ flex:1 }}>
-              <div style={{ fontSize:11, color:C.text }}>{p.item}</div>
-              <div style={{ fontSize:10, color:C.muted, marginTop:2 }}>{p.prazo}</div>
+        <SectionLabel>Pendencias Criticas ({pendencias.length})</SectionLabel>
+        {pendencias.length === 0
+          ? <div style={{ fontSize:12, color:C.green, textAlign:'center', padding:'8px 0' }}>Todas as pendencias concluidas!</div>
+          : pendencias.map((p,i) => (
+            <div key={i} style={{ display:'flex', gap:8, alignItems:'flex-start', padding:'6px 0', borderBottom:`1px solid ${C.border}` }}>
+              <Badge color={RESP_COLOR[p.resp]||C.muted}>{p.resp}</Badge>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:11, color:C.text }}>{p.item}</div>
+                <div style={{ fontSize:10, color:C.muted, marginTop:2 }}>{p.prazo}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </Card>
       <Card>
         <SectionLabel>Embarcacoes</SectionLabel>
