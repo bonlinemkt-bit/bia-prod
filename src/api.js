@@ -10,51 +10,74 @@ CONTEXTO:
 
 ENTREGAVEIS:
 - Stories diarios: corte seco, musica, solta
-- 4 Reels/dia caprichados
-- Ritual de venda: vendedor avisa Stefano via WhatsApp => champagne + brinde
+- 4 Reels/dia caprichados - foco real de qualidade
+- Ritual de venda: vendedor avisa Stefano via WhatsApp => champagne, brinde, tacas
+- Test drive 355: Stefano embarca, capta depoimento espontaneo na saida
 - Drone: 4 barcos alinhados - foto vertical 100% + video passando por cima
-- Overviews institucionais em ingles: Focker 355, 366, 388
-  * Formato A (insert): Bernard na popa + inserts + gancho + voice over + CTA
-  * Formato B (walking): Bernard andando pelo barco ao vivo
-  * 366 e 388 com formatos diferentes entre si
+- Timelapse do corredor do estande
+- Overviews em ingles: Focker 355, 366, 388 (Formatos A e B)
 
 TRILHAS: rock animado (reels) | afro house / house elegante (depoimentos)
+DRIVE: upload ao final de cada dia
 DRONE: autorizacao formal obrigatoria - Thay providencia
 NF: Stefano emite no inicio - pagamento semana seguinte
 
-Responda de forma direta, tecnica e executavel. Apenas producao audiovisual e logistica.`
+FLUXO: duvidas de Stefano => B.IA PROD => se nao souber, gera lista para Thay responder.
+Resposta direta, tecnica, executavel. Apenas producao audiovisual e logistica.`
+
+function toGeminiContents(messages, systemPrompt) {
+  const contents = []
+  if (systemPrompt) {
+    contents.push({ role: 'user', parts: [{ text: `[INSTRUCOES]\n${systemPrompt}` }] })
+    contents.push({ role: 'model', parts: [{ text: 'Entendido. Pronto para atuar.' }] })
+  }
+  for (const m of messages) {
+    contents.push({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    })
+  }
+  return contents
+}
 
 export async function callClaude(messages, systemOverride) {
-  const key = import.meta.env.VITE_ANTHROPIC_KEY
-  if (!key) throw new Error('Chave VITE_ANTHROPIC_KEY nao configurada no .env')
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const key = import.meta.env.VITE_GEMINI_KEY
+  if (!key) throw new Error('Chave VITE_GEMINI_KEY nao configurada')
+
+  const contents = toGeminiContents(messages, systemOverride || SYSTEM_PROMPT)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`
+
+  const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 2000, system: systemOverride || SYSTEM_PROMPT, messages }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents,
+      generationConfig: { maxOutputTokens: 2000, temperature: 0.7 },
+    }),
   })
+
   const data = await res.json()
   if (data.error) throw new Error(data.error.message)
-  return data.content.find(b => b.type === 'text')?.text || ''
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+  if (!text) throw new Error('Resposta vazia do Gemini')
+  return text
 }
 
 export function buildIdeaPrompt(assunto, tipo) {
-  const isEvento = assunto.startsWith('Itajai Boat Show')
-  const isMarca = assunto.startsWith('Focker / Fibrafort')
+  const isEvento = assunto.includes('Boat Show')
+  const isMarca  = assunto.includes('Fibrafort')
+
   const contexto = isEvento
-    ? 'Foco: atmosfera, movimento e momentos do evento - ambiente, publico premium, corredor do estande, timelapse, ritual de champagne.'
+    ? 'Foco: atmosfera, movimento e momentos do evento - publico premium, corredor, timelapse, ritual de champagne.'
     : isMarca
-    ? 'Foco: identidade visual e emocional da marca Focker / Fibrafort - equipe, acabamento, depoimentos espontaneos, posicionamento premium.'
+    ? 'Foco: identidade visual e emocional da marca Focker / Fibrafort - equipe, acabamento, depoimentos, posicionamento premium.'
     : `Foco: a embarcacao ${assunto} - angulos, diferenciais, detalhes tecnicos, experiencia de uso.`
+
   return `Voce e especialista em captacao audiovisual para eventos nauticos premium.
 Gere 5 ideias de ${tipo === 'story' ? 'Stories' : 'Reels'} para captar durante o Itajai Boat Show 2026.
 Assunto: ${assunto}
 ${contexto}
-Contexto: smartphone + drone, 1 cameraman (Stefano/Brava Reels), feira nautica, publico premium. Tudo executavel sem ensaio.
+Contexto: smartphone + drone, 1 cameraman (Stefano/Brava Reels), feira nautica, publico premium. Executavel sem ensaio.
 
 Formato de cada ideia:
 TITULO: (max 8 palavras)
