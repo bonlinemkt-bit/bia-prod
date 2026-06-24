@@ -1,3 +1,7 @@
+// B.IA PROD — API via Puter.js
+// Sem chave de API, sem cartão, sem backend
+// Puter.js provê acesso gratuito ao Claude diretamente no browser
+
 const SYSTEM_PROMPT = `Voce e o B.IA PROD - agente de producao executiva da captacao audiovisual do Itajai Boat Show 2026.
 
 CONTEXTO:
@@ -10,57 +14,54 @@ CONTEXTO:
 
 ENTREGAVEIS:
 - Stories diarios: corte seco, musica, solta
-- 4 Reels/dia caprichados - foco real de qualidade
+- 4 Reels/dia caprichados
 - Ritual de venda: vendedor avisa Stefano via WhatsApp => champagne, brinde, tacas
-- Test drive 355: Stefano embarca, capta depoimento espontaneo na saida
+- Test drive 355: Stefano embarca, capta depoimento na saida
 - Drone: 4 barcos alinhados - foto vertical 100% + video passando por cima
 - Timelapse do corredor do estande
 - Overviews em ingles: Focker 355, 366, 388 (Formatos A e B)
 
 TRILHAS: rock animado (reels) | afro house / house elegante (depoimentos)
-DRIVE: upload ao final de cada dia
 DRONE: autorizacao formal obrigatoria - Thay providencia
 NF: Stefano emite no inicio - pagamento semana seguinte
 
 FLUXO: duvidas de Stefano => B.IA PROD => se nao souber, gera lista para Thay responder.
 Resposta direta, tecnica, executavel. Apenas producao audiovisual e logistica.`
 
-function toGeminiContents(messages, systemPrompt) {
-  const contents = []
-  if (systemPrompt) {
-    contents.push({ role: 'user', parts: [{ text: `[INSTRUCOES]\n${systemPrompt}` }] })
-    contents.push({ role: 'model', parts: [{ text: 'Entendido. Pronto para atuar.' }] })
-  }
-  for (const m of messages) {
-    contents.push({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    })
-  }
-  return contents
+// Carrega Puter.js dinamicamente se ainda nao estiver carregado
+async function loadPuter() {
+  if (typeof window.puter !== 'undefined') return window.puter
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://js.puter.com/v2/'
+    script.onload = () => resolve(window.puter)
+    script.onerror = () => reject(new Error('Falha ao carregar Puter.js'))
+    document.head.appendChild(script)
+  })
 }
 
 export async function callClaude(messages, systemOverride) {
-  const key = import.meta.env.VITE_GEMINI_KEY
-  if (!key) throw new Error('Chave VITE_GEMINI_KEY nao configurada')
+  const puter = await loadPuter()
 
-  const contents = toGeminiContents(messages, systemOverride || SYSTEM_PROMPT)
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`
+  const sys = systemOverride || SYSTEM_PROMPT
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents,
-      generationConfig: { maxOutputTokens: 2000, temperature: 0.7 },
-    }),
+  // Monta o historico no formato Puter (array de mensagens)
+  // Injeta o system prompt como primeira mensagem user/assistant
+  const history = [
+    { role: 'user', content: `[INSTRUCOES DO AGENTE]\n${sys}` },
+    { role: 'assistant', content: 'Entendido. Pronto para atuar como B.IA PROD.' },
+    ...messages
+  ]
+
+  const response = await puter.ai.chat(history, {
+    model: 'claude-sonnet-4-6',
   })
 
-  const data = await res.json()
-  if (data.error) throw new Error(data.error.message)
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-  if (!text) throw new Error('Resposta vazia do Gemini')
-  return text
+  // Puter retorna string ou objeto dependendo do modelo
+  if (typeof response === 'string') return response
+  if (response?.message?.content?.[0]?.text) return response.message.content[0].text
+  if (response?.content?.[0]?.text) return response.content[0].text
+  return String(response)
 }
 
 export function buildIdeaPrompt(assunto, tipo) {
