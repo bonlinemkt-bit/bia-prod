@@ -1,5 +1,5 @@
-// B.IA PROD — API via Puter.js
-// Sem chave de API, sem cartão, sem backend
+// B.IA PROD - API via Puter.js
+// Sem chave de API, sem cartao, sem backend
 // Puter.js provê acesso gratuito ao Claude diretamente no browser
 
 const SYSTEM_PROMPT = `Voce e o B.IA PROD - agente de producao executiva da captacao audiovisual do Itajai Boat Show 2026.
@@ -28,7 +28,6 @@ NF: Stefano emite no inicio - pagamento semana seguinte
 FLUXO: duvidas de Stefano => B.IA PROD => se nao souber, gera lista para Thay responder.
 Resposta direta, tecnica, executavel. Apenas producao audiovisual e logistica.`
 
-// Carrega Puter.js dinamicamente se ainda nao estiver carregado
 async function loadPuter() {
   if (typeof window.puter !== 'undefined') return window.puter
   return new Promise((resolve, reject) => {
@@ -40,28 +39,30 @@ async function loadPuter() {
   })
 }
 
+function extrairTexto(r) {
+  // Puter retorna objeto com message.content[0].text
+  if (r?.message?.content?.[0]?.text) return r.message.content[0].text
+  if (r?.content?.[0]?.text) return r.content[0].text
+  if (r?.text) return r.text
+  if (typeof r?.toString === 'function') {
+    const s = r.toString()
+    if (s !== '[object Object]') return s
+  }
+  return JSON.stringify(r)
+}
+
 export async function callClaude(messages, systemOverride) {
   const puter = await loadPuter()
-
   const sys = systemOverride || SYSTEM_PROMPT
 
-  // Monta o historico no formato Puter (array de mensagens)
-  // Injeta o system prompt como primeira mensagem user/assistant
   const history = [
     { role: 'user', content: `[INSTRUCOES DO AGENTE]\n${sys}` },
     { role: 'assistant', content: 'Entendido. Pronto para atuar como B.IA PROD.' },
     ...messages
   ]
 
-  const response = await puter.ai.chat(history, {
-    model: 'claude-sonnet-4-6',
-  })
-
-  // Puter retorna string ou objeto dependendo do modelo
-  if (typeof response === 'string') return response
-  if (response?.message?.content?.[0]?.text) return response.message.content[0].text
-  if (response?.content?.[0]?.text) return response.content[0].text
-  return String(response)
+  const response = await puter.ai.chat(history, { model: 'claude-sonnet-4-6' })
+  return extrairTexto(response)
 }
 
 export function buildIdeaPrompt(assunto, tipo) {
