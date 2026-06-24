@@ -40,7 +40,7 @@ export const BRIEFING = {
 }
 
 export const FASES_INICIAL = [
-  { id:'pre', label:'Pre-Evento', color:'#0ea5e9', icon:'📅', items:[
+  { id:'pre', label:'Pre-Evento', color:'#0ea5e9', icon:'', items:[
     {resp:'Thay',    data:'ate 27/Jun',    texto:'Enviar brand guide (fontes, cores, guide da campanha)', done:false},
     {resp:'Thay',    data:'ate 27/Jun',    texto:'Abrir Google Drive e adicionar Stefano como editor', done:false},
     {resp:'Thay',    data:'ate 27/Jun',    texto:'Enviar referencias de reels do ano passado + trilhas', done:false},
@@ -53,7 +53,7 @@ export const FASES_INICIAL = [
     {resp:'Bernard', data:'antes 02/Jul',  texto:'Revisar cronograma do Stefano e passar para Thay', done:false},
     {resp:'Bernard', data:'antes 02/Jul',  texto:'Alinhar com Stefano momento de gravacao dos overviews', done:false},
   ]},
-  { id:'d1', label:'Dia 1 - 02/Jul (Qui)', color:'#f59e0b', icon:'🎬', items:[
+  { id:'d1', label:'Dia 1 - 02/Jul (Qui)', color:'#f59e0b', icon:'', items:[
     {resp:'Stefano', data:'manha cedo',      texto:'Shot drone: 4 barcos alinhados - foto vertical 100% + video passando por cima', done:false},
     {resp:'Stefano', data:'manha',           texto:'Captacao geral de abertura do estande / chegada da equipe Fibrafort', done:false},
     {resp:'Stefano', data:'oportunista',     texto:'Overview institucional Focker 355 - ingles (Formato A ou B)', done:false},
@@ -65,30 +65,30 @@ export const FASES_INICIAL = [
     {resp:'Stefano', data:'fim do dia',      texto:'Editar e entregar 4 Reels do dia', done:false},
     {resp:'Stefano', data:'02/Jul',          texto:'Emitir NF e entregar para Thay/Bernard', done:false},
   ]},
-  { id:'d2', label:'Dia 2 - 03/Jul (Sex)', color:'#f59e0b', icon:'🎬', items:[
+  { id:'d2', label:'Dia 2 - 03/Jul (Sex)', color:'#f59e0b', icon:'', items:[
     {resp:'Stefano', data:'manha/oportunista', texto:'Overview institucional Focker 366 GTS - ingles (formato diferente da 388)', done:false},
     {resp:'Stefano', data:'ao longo do dia',   texto:'Stories do dia + ritual de venda', done:false},
     {resp:'Stefano', data:'ao longo do dia',   texto:'Captacao de detalhes tecnicos: motor, acabamento, cabine', done:false},
     {resp:'Stefano', data:'ao longo do dia',   texto:'Captar depoimentos de visitantes / potenciais compradores', done:false},
     {resp:'Stefano', data:'fim do dia',        texto:'Upload material Drive (pasta Dia 2) + entregar 4 Reels', done:false},
   ]},
-  { id:'d3', label:'Dia 3 - 04/Jul (Sab)', color:'#f59e0b', icon:'🎬', items:[
+  { id:'d3', label:'Dia 3 - 04/Jul (Sab)', color:'#f59e0b', icon:'', items:[
     {resp:'Stefano', data:'manha/oportunista', texto:'Overview institucional Focker 388 GT - ingles (formato diferente da 366)', done:false},
     {resp:'Stefano', data:'ao longo do dia',   texto:'Stories do dia + ritual de venda', done:false},
     {resp:'Stefano', data:'ao longo do dia',   texto:'Focker 420 e barcos no seco (foco secundario)', done:false},
     {resp:'Stefano', data:'fim do dia',        texto:'Upload material Drive (pasta Dia 3) + entregar 4 Reels', done:false},
   ]},
-  { id:'d4', label:'Dia 4 - 05/Jul (Dom)', color:'#f59e0b', icon:'🎬', items:[
+  { id:'d4', label:'Dia 4 - 05/Jul (Dom)', color:'#f59e0b', icon:'', items:[
     {resp:'Stefano', data:'ao longo do dia', texto:'Stories do dia + ritual de venda', done:false},
     {resp:'Stefano', data:'ao longo do dia', texto:'Captar depoimentos finais e melhores momentos para compilado', done:false},
     {resp:'Stefano', data:'fim do dia',      texto:'Upload material Drive (pasta Dia 4) + entregar 4 Reels', done:false},
   ]},
-  { id:'d5', label:'Dia 5 - 06/Jul (Seg)', color:'#f59e0b', icon:'🎬', items:[
+  { id:'d5', label:'Dia 5 - 06/Jul (Seg)', color:'#f59e0b', icon:'', items:[
     {resp:'Stefano', data:'ao longo do dia', texto:'Stories do dia + ritual de venda', done:false},
     {resp:'Stefano', data:'fim do dia',      texto:'Upload material Drive (pasta Dia 5) + entregar 4 Reels', done:false},
     {resp:'Thay',    data:'06/Jul (meta)',   texto:'Efetuar pagamento de Stefano (NF emitida no Dia 1)', done:false},
   ]},
-  { id:'d6', label:'Dia 6 - 07/Jul (Ter) + Pos', color:'#a855f7', icon:'📦', items:[
+  { id:'d6', label:'Dia 6 - 07/Jul (Ter) + Pos', color:'#a855f7', icon:'', items:[
     {resp:'Stefano', data:'pos-evento', texto:'Entregar overviews (355/366/388) se nao gravados durante o evento', done:false},
     {resp:'Bernard', data:'pos-evento', texto:'Confirmar recebimento e organizacao de todo o material no Drive', done:false},
     {resp:'Bernard', data:'pos-evento', texto:'Solicitar feedback de Thay sobre o material entregue', done:false},
