@@ -27,7 +27,7 @@ export function ProgressBar({ value, total, color = C.accent }) {
 export function Checkbox({ checked, color = C.accent, onChange }) {
   return (
     <div
-      onClick={(e) => { e.stopPropagation(); if (onChange) onChange() }}
+      onClick={onChange}
       style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${checked ? color : C.border}`, background: checked ? color + '22' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: 'pointer', marginTop: 1 }}
     >
       {checked && <span style={{ color, fontSize: 11, lineHeight: 1 }}>&#10003;</span>}
