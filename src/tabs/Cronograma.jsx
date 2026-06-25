@@ -17,7 +17,7 @@ export default function Cronograma({ fases, onToggle }) {
             <div style={{ marginTop: 10 }}>
               {fase.items.map((it, i) => (
                 <div key={i} onClick={() => onToggle(fase.id, i)} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '7px 0', borderBottom: i < fase.items.length-1 ? `1px solid ${C.border}` : 'none', cursor: 'pointer' }}>
-                  <Checkbox checked={it.done} color={RESP_COLOR[it.resp] || fase.color} onChange={() => onToggle(fase.id, i)} />
+                  <Checkbox checked={it.done} color={RESP_COLOR[it.resp] || fase.color} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginBottom: 2 }}>
                       <Badge color={RESP_COLOR[it.resp] || C.muted}>{it.resp}</Badge>
